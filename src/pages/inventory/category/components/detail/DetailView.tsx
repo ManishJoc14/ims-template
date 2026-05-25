@@ -18,7 +18,12 @@ const DetailView: React.FC<IDetailViewProps> = ({ categoryData, onClose }) => {
   if (!categoryData) {
     return (
       <Paper elevation={3} sx={{ p: 4, textAlign: 'center' }}>
-        <Typography variant="h5" mb={3}>
+        <Typography
+          variant="h5"
+          sx={{
+            mb: 3
+          }}
+        >
           Category Details Not Found
         </Typography>
         <CircularProgress />

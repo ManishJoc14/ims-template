@@ -1,4 +1,4 @@
-import { Grid } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import { FormSectionProps } from './types';
 import CustomInput from '@/components/app-form/CustomInput';
 import { Controller, Path, ArrayPath } from 'react-hook-form';
@@ -28,7 +28,7 @@ export default function FormSection<T extends Record<string, any>>({
           const arrayFieldName = field.name as ArrayPath<T>;
           const pathFieldName = field.name as Path<T>;
           return (
-            <Grid item xxs={field.xxs || 12} xs={field.xs || 12} sm={field.sm || 12} key={field.name as string} sx={{ mb: 1 }}>
+            <Grid key={field.name as string} sx={{ mb: 1 }} size={{ xxs: field.xxs || 12, xs: field.xs || 12, sm: field.sm || 12 }}>
               {field.type === 'array' ? (
                 <DynamicFieldArraySection
                   name={arrayFieldName}

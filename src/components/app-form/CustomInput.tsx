@@ -1,6 +1,6 @@
 // MUI imports
+import { CloudUploadOutlined, DeleteOutlined, EditOutlined } from '@mui/icons-material';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
-import { DeleteOutline, EditOutlined, CloudUploadOutlined } from '@mui/icons-material';
 
 import {
   Box,
@@ -18,7 +18,7 @@ import {
   Switch,
   Typography
 } from '@mui/material';
-import { alpha, useTheme, Theme } from '@mui/material/styles';
+import { alpha, Theme, useTheme } from '@mui/material/styles';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -28,16 +28,16 @@ import dayjs from 'dayjs';
 import React, { forwardRef, useEffect, useRef } from 'react';
 
 // Project imports
-import { CustomInputProps, SelectOption } from './types';
-import { ErrorForInput, LabelForInput } from './Helpers';
-import { useInputHandlers } from './useInputHandlers';
 import PdfImage from '@/assets/images/pdf.png';
+import { ErrorForInput, LabelForInput } from './Helpers';
+import { CustomInputProps, SelectOption } from './types';
+import { useInputHandlers } from './useInputHandlers';
 
 // Import RichTextEditor and any required subcomponents or extensions
 import { RichTextEditor, RichTextEditorRef } from 'mui-tiptap';
-import useExtensions from './useExtensions';
-import EditorMenuControls from './EditorMenuControls';
 import FilePreviewDialog from '../app-dialog/FilePreviewDialog';
+import EditorMenuControls from './EditorMenuControls';
+import useExtensions from './useExtensions';
 
 /* ------------------------------------------------------------------
    CustomInput Component
@@ -74,7 +74,7 @@ const CustomInput = forwardRef<any, CustomInputProps>(
   ) => {
     // Destructure container-specific props (like sx, style, className)
     // The rest are intended for the actual input component.
-    const { sx, style, inputStyle, className, ...inputProps } = rest;
+    const { sx, style, inputStyle, className, InputProps, onBlur, ...inputProps } = rest;
     const errorId = error ? `${name}-error-text` : undefined;
     const theme = useTheme();
     const extensions = useExtensions({ placeholder: 'Write something awesome...' });
@@ -118,7 +118,7 @@ const CustomInput = forwardRef<any, CustomInputProps>(
               error={error}
               aria-describedby={errorId}
               {...(fullwidth ? { fullWidth: true } : {})}
-              inputRef={setRef}
+              ref={setRef as any}
               multiple={multipleChips}
               renderValue={(selected) => {
                 const selectedOption = multipleChips
@@ -195,8 +195,8 @@ const CustomInput = forwardRef<any, CustomInputProps>(
                   groupItems.forEach((option) => {
                     items.push(
                       <MenuItem
-                        key={option.value}
-                        value={option.value}
+                        key={String(option.value)}
+                        value={option.value as any}
                         sx={option?.sx}
                         onClick={(e) => {
                           if (!multipleChips && value === option.value) {
@@ -211,8 +211,8 @@ const CustomInput = forwardRef<any, CustomInputProps>(
                             width: '100%',
                             ...(option?.sx
                               ? {
-                                  backgroundColor: option.sx['& .MuiBox-root']?.backgroundColor,
-                                  color: option.sx['& .MuiBox-root']?.color
+                                  backgroundColor: (option.sx as any)['& .MuiBox-root']?.backgroundColor,
+                                  color: (option.sx as any)['& .MuiBox-root']?.color
                                 }
                               : {}),
                             maxWidth: 'fit-content',
@@ -262,7 +262,12 @@ const CustomInput = forwardRef<any, CustomInputProps>(
               sx={{ ...inputStyle }}
             >
               {options?.map((option: SelectOption) => (
-                <FormControlLabel key={option.value} value={option.value} control={<Radio {...inputProps} />} label={option.label} />
+                <FormControlLabel
+                  key={String(option.value)}
+                  value={option.value}
+                  control={<Radio {...inputProps} />}
+                  label={option.label}
+                />
               ))}
             </RadioGroup>
             <ErrorForInput error={error} helperText={helperText} />
@@ -280,7 +285,7 @@ const CustomInput = forwardRef<any, CustomInputProps>(
               onChange={onChange}
               aria-describedby={errorId}
               sx={{ ...inputStyle }}
-              inputRef={setRef}
+              ref={setRef as any}
               {...inputProps}
             />
             <ErrorForInput error={error} helperText={helperText} />
@@ -288,11 +293,11 @@ const CustomInput = forwardRef<any, CustomInputProps>(
           </Box>
         );
 
-      case 'file':
+      case 'file': {
         // Determine currentDisplayedUrl and initial file type flags
         let currentDisplayedUrl;
-        let isImage = false;
-        let isPdf = false;
+        let isImage;
+        let isPdf;
         const isCurrentlyAFileObject = value instanceof File;
 
         if (isCurrentlyAFileObject) {
@@ -311,7 +316,7 @@ const CustomInput = forwardRef<any, CustomInputProps>(
           isPdf = currentDisplayedUrl && currentDisplayedUrl.endsWith('.pdf');
         }
 
-        let ButtonLabel = currentDisplayedUrl ? (isPdf ? 'Change PDF' : isImage ? 'Change Image' : 'Change File') : 'Upload File';
+        const ButtonLabel = currentDisplayedUrl ? (isPdf ? 'Change PDF' : isImage ? 'Change Image' : 'Change File') : 'Upload File';
 
         return (
           <Box sx={sx} style={style} className={className}>
@@ -359,6 +364,7 @@ const CustomInput = forwardRef<any, CustomInputProps>(
             <FilePreviewDialog open={isFileModalOpen} onClose={handleCloseFileModal} fileUrl={fileModalUrl} isPdf={isCurrentFilePdf} />
           </Box>
         );
+      }
 
       case 'image':
         return (
@@ -460,7 +466,7 @@ const CustomInput = forwardRef<any, CustomInputProps>(
                             '&:hover': { backgroundColor: alpha(theme.palette.error.light, 0.4) }
                           }}
                         >
-                          <DeleteOutline />
+                          <DeleteOutlined />
                         </IconButton>
                       </Box>
                     </Box>
@@ -514,7 +520,7 @@ const CustomInput = forwardRef<any, CustomInputProps>(
               onChange={onChange}
               aria-describedby={errorId}
               sx={{ ...inputStyle, scale: 0.85 }}
-              inputRef={setRef}
+              ref={setRef as any}
               {...inputProps}
             />
             <Typography variant="body1" sx={{ ml: 1, display: 'inline-flex' }}>
@@ -539,7 +545,7 @@ const CustomInput = forwardRef<any, CustomInputProps>(
               {...renderPasswordVisibility(name)}
               error={error}
               placeholder={placeholder}
-              inputRef={setRef}
+              ref={setRef as any}
               sx={{ ...inputStyle }}
               {...inputProps}
             />
@@ -573,7 +579,7 @@ const CustomInput = forwardRef<any, CustomInputProps>(
                   }
                 }}
                 aria-describedby={errorId}
-                inputRef={setRef}
+                ref={setRef as any}
                 sx={{ ...(fullwidth ? { width: '100%' } : {}) }}
               />
               <ErrorForInput error={error} helperText={helperText} />
@@ -595,7 +601,7 @@ const CustomInput = forwardRef<any, CustomInputProps>(
               error={error}
               aria-describedby={errorId}
               placeholder={placeholder}
-              inputRef={setRef}
+              ref={setRef as any}
               sx={{ ...inputStyle }}
               {...inputProps}
             />
@@ -669,7 +675,7 @@ const CustomInput = forwardRef<any, CustomInputProps>(
               error={error}
               aria-describedby={errorId}
               placeholder={placeholder}
-              inputRef={setRef}
+              ref={setRef as any}
               sx={{ ...inputStyle }}
               {...inputProps}
             />

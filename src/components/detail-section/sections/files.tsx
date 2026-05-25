@@ -1,4 +1,5 @@
-import { Box, Grid, Typography, useTheme } from '@mui/material';
+import { Box, Typography, useTheme } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import { InsertDriveFile } from '@mui/icons-material';
 import MainCard from '@/components/cards/MainCard';
 
@@ -28,7 +29,6 @@ export const FilesSection: React.FC<FilesSectionProps> = ({ files, onFileClick }
       >
         Files
       </Typography>
-
       <Grid container spacing={2}>
         {files.map((file) => {
           if (!file.url) return null;
@@ -37,7 +37,7 @@ export const FilesSection: React.FC<FilesSectionProps> = ({ files, onFileClick }
           const isImage = /\.(png|jpg|jpeg|gif)$/.test(file.url.toLowerCase());
 
           return (
-            <Grid item key={file.url}>
+            <Grid key={file.url}>
               <MainCard
                 sx={{
                   width: 160,

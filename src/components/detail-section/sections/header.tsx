@@ -1,4 +1,4 @@
-import { CancelOutlined, CheckCircleOutline } from '@mui/icons-material';
+import { CancelOutlined, CheckCircleOutlined } from '@mui/icons-material';
 import { Avatar, Box, Chip, Typography } from '@mui/material';
 
 export const Header: React.FC<{ title: string; avatar?: string; status?: 'active' | 'inactive' }> = ({ title, avatar, status }) => (
@@ -27,7 +27,7 @@ export const Header: React.FC<{ title: string; avatar?: string; status?: 'active
             variant="outlined"
             color={status === 'active' ? 'success' : 'error'}
             label={status === 'active' ? 'Active' : 'Inactive'}
-            icon={status === 'active' ? <CheckCircleOutline fontSize="small" /> : <CancelOutlined fontSize="small" />}
+            icon={status === 'active' ? <CheckCircleOutlined fontSize="small" /> : <CancelOutlined fontSize="small" />}
             sx={{ mr: 1, p: 1.5, fontWeight: 500, borderRadius: 1 }}
           />
         </Box>

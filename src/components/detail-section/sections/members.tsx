@@ -1,5 +1,5 @@
 import MainCard from '@/components/cards/MainCard';
-import { CancelOutlined, CheckCircleOutline } from '@mui/icons-material';
+import { CancelOutlined, CheckCircleOutlined } from '@mui/icons-material';
 import { Avatar, Box, Chip, Typography } from '@mui/material';
 import { MemberItem } from '../types';
 
@@ -11,7 +11,12 @@ interface MembersSectionProps {
 export const MembersSection: React.FC<MembersSectionProps> = ({ members, onFileClick }) => {
   if (!members || members.length === 0)
     return (
-      <Typography variant="body2" color="text.secondary">
+      <Typography
+        variant="body2"
+        sx={{
+          color: 'text.secondary'
+        }}
+      >
         No attached members.
       </Typography>
     );
@@ -51,11 +56,22 @@ export const MembersSection: React.FC<MembersSectionProps> = ({ members, onFileC
               {member.fullName?.charAt(0) || 'U'}
             </Avatar>
             <Box sx={{ display: 'grid', placeItems: 'center' }}>
-              <Typography variant="h6" fontWeight={500}>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 500
+                }}
+              >
                 {member.fullName || 'Member'}
               </Typography>
               {member.designation && (
-                <Typography variant="body1" fontWeight={400} sx={{ mb: 2 }}>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    fontWeight: 400,
+                    mb: 2
+                  }}
+                >
                   {member.designation}
                 </Typography>
               )}
@@ -64,7 +80,7 @@ export const MembersSection: React.FC<MembersSectionProps> = ({ members, onFileC
                 variant="outlined"
                 color={member.isActive ? 'success' : 'error'}
                 label={member.isActive ? 'Active' : 'Inactive'}
-                icon={member.isActive ? <CheckCircleOutline fontSize="small" /> : <CancelOutlined fontSize="small" />}
+                icon={member.isActive ? <CheckCircleOutlined fontSize="small" /> : <CancelOutlined fontSize="small" />}
                 sx={{
                   p: 1.5,
                   fontWeight: 500,

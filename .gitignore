@@ -118,4 +118,4 @@ dist
 # typescript cache
 *.tsbuildinfo
 
-.vscode/
+/.vscode/

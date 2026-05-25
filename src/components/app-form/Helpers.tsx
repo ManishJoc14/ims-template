@@ -7,11 +7,23 @@ import { Box, FormHelperText } from '@mui/material';
 ------------------------------------------------------------------ */
 export const LabelForInput = React.memo(({ name, label, required }: { name: string; label?: string; required?: boolean }) =>
   label ? (
-    <Typography variant="h5" fontWeight={400} sx={{ mb: 1 }}>
+    <Typography
+      variant="h5"
+      sx={{
+        fontWeight: 400,
+        mb: 1
+      }}
+    >
       <label htmlFor={name}>
         {label}
         {required && (
-          <Typography variant="body1" sx={{ display: 'inline' }} color="error.main">
+          <Typography
+            variant="body1"
+            sx={{
+              color: 'error.main',
+              display: 'inline'
+            }}
+          >
             *
           </Typography>
         )}
@@ -23,11 +35,23 @@ export const LabelForInput = React.memo(({ name, label, required }: { name: stri
 export const LabelForDynamicSection = React.memo(({ name, label, required }: { name: string; label?: string; required?: boolean }) =>
   label ? (
     <>
-      <Typography variant="h4" fontWeight={400} sx={{ mt: 4 }}>
+      <Typography
+        variant="h4"
+        sx={{
+          fontWeight: 400,
+          mt: 4
+        }}
+      >
         <label htmlFor={name}>
           {label}
           {required && (
-            <Typography variant="body1" sx={{ display: 'inline' }} color="error.main">
+            <Typography
+              variant="body1"
+              sx={{
+                color: 'error.main',
+                display: 'inline'
+              }}
+            >
               *
             </Typography>
           )}

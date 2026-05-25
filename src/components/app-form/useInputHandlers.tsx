@@ -4,14 +4,14 @@ import { IconButton, InputAdornment } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 type UseInputHandlersProps = {
-  ref: any;
-  externalRef?: any;
+  ref: React.ForwardedRef<any>;
+  externalRef?: React.Ref<any>;
   name: string;
-  value: any;
+  value: unknown;
   onChange: (e: any) => void;
   multipleChips?: boolean;
   showPassword?: Record<string, boolean>;
-  handleToggleVisibility?: (field: string) => void;
+  handleToggleVisibility?: (field: any) => void;
 };
 
 export function useInputHandlers({

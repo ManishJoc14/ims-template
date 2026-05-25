@@ -110,7 +110,7 @@ const DynamicInfoSection = <T,>({
         const content = renderValue(String(path), rawValue, dateTimeFields.map(String), booleanFields.map(String));
 
         return (
-          <Grid item xs={12} sm={6} md={12 / columns} key={String(path)}>
+          <Grid key={String(path)} size={{ xs: 12, sm: 6, md: 12 / columns }}>
             <InfoField label={label} value={content} />
           </Grid>
         );

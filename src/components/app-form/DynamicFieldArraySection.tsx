@@ -1,5 +1,6 @@
 // MUI IMPORTS
-import { Button, Grid, IconButton, Typography } from '@mui/material';
+import { Button, IconButton, Typography } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import { DeleteOutlined } from '@ant-design/icons';
 
 // REACT HOOK FORM IMPORTS
@@ -53,7 +54,7 @@ export default function DynamicFieldArraySection<T extends Record<string, any>>(
             {itemFields.map((item) => {
               const fieldName = `${name}.${index}.${String(item.name)}` as Path<T>;
               return (
-                <Grid item key={fieldName} xxs={item.xxs || 11} xs={item.xs || 11} sm={item.sm || 11}>
+                <Grid key={fieldName} size={{ xxs: item.xxs || 11, xs: item.xs || 11, sm: item.sm || 11 }}>
                   <Controller
                     name={fieldName}
                     control={control}
@@ -78,7 +79,7 @@ export default function DynamicFieldArraySection<T extends Record<string, any>>(
             {/* Delete Button */}
             {/* if it is required, ensure at least one field remains else allow deletion all */}
             {fields.length > (required ? 1 : 0) && (
-              <Grid item xxs={1} xs={1} sm={1} alignSelf="center">
+              <Grid sx={{ alignSelf: 'center' }} size={{ xxs: 1, xs: 1, sm: 1 }}>
                 <IconButton
                   color="error"
                   onClick={() => {
@@ -95,7 +96,6 @@ export default function DynamicFieldArraySection<T extends Record<string, any>>(
       ) : (
         <Typography sx={{ mb: 2, color: 'text.secondary' }}>No {label?.toLowerCase() ?? 'fields'} added yet. Click "Add More".</Typography>
       )}
-
       {/* Add More Button */}
       <Button
         variant="outlined"

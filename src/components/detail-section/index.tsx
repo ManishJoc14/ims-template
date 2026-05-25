@@ -42,7 +42,12 @@ const DetailView: React.FC<DetailViewProps> = ({ title, avatar, status, sections
   if (!sections || sections.length === 0) {
     return (
       <Paper elevation={3} sx={{ p: 4, textAlign: 'center' }}>
-        <Typography variant="h5" mb={3}>
+        <Typography
+          variant="h5"
+          sx={{
+            mb: 3
+          }}
+        >
           No details found
         </Typography>
         <CircularProgress />
