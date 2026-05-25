@@ -1,10 +1,10 @@
 // MUI imports
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
+import { DeleteOutline, EditOutlined, CloudUploadOutlined } from '@mui/icons-material';
 
 import {
   Box,
+  Button,
   Checkbox,
   Chip,
   FormControlLabel,
@@ -18,19 +18,26 @@ import {
   Switch,
   Typography
 } from '@mui/material';
-import { useTheme } from '@mui/system';
+import { alpha, useTheme, Theme } from '@mui/material/styles';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 // React imports
 import dayjs from 'dayjs';
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useEffect, useRef } from 'react';
 
 // Project imports
 import { CustomInputProps, SelectOption } from './types';
 import { ErrorForInput, LabelForInput } from './Helpers';
 import { useInputHandlers } from './useInputHandlers';
+import PdfImage from '@/assets/images/pdf.png';
+
+// Import RichTextEditor and any required subcomponents or extensions
+import { RichTextEditor, RichTextEditorRef } from 'mui-tiptap';
+import useExtensions from './useExtensions';
+import EditorMenuControls from './EditorMenuControls';
+import FilePreviewDialog from '../app-dialog/FilePreviewDialog';
 
 /* ------------------------------------------------------------------
    CustomInput Component
@@ -44,6 +51,7 @@ const CustomInput = forwardRef<any, CustomInputProps>(
       value,
       onChange,
       options,
+      accpetFileTypes = 'image/*,application/*',
       multiline = false,
       rows = 1,
       fullwidth = true,
@@ -69,6 +77,7 @@ const CustomInput = forwardRef<any, CustomInputProps>(
     const { sx, style, inputStyle, className, ...inputProps } = rest;
     const errorId = error ? `${name}-error-text` : undefined;
     const theme = useTheme();
+    const extensions = useExtensions({ placeholder: 'Write something awesome...' });
 
     const {
       setRef,
@@ -77,6 +86,12 @@ const CustomInput = forwardRef<any, CustomInputProps>(
       imagePreview,
       handleImageChange,
       handleRemoveImage,
+      isFileModalOpen,
+      fileModalUrl,
+      isCurrentFilePdf,
+      handleOpenFileModal,
+      handleCloseFileModal,
+      handleFileChange,
       renderPasswordVisibility,
       handleSelectChange
     } = useInputHandlers({
@@ -125,7 +140,7 @@ const CustomInput = forwardRef<any, CustomInputProps>(
                             ? {
                                 backgroundColor: selectedOption.sx['& .MuiBox-root']?.backgroundColor,
                                 color: selectedOption.sx['& .MuiBox-root']?.color,
-                                fontSize: (theme) => theme.typography.body2.fontSize,
+                                fontSize: (theme: Theme) => theme.typography.body2.fontSize,
                                 borderRadius: '4px',
                                 padding: '2px 10px',
                                 maxWidth: 'fit-content'
@@ -150,7 +165,7 @@ const CustomInput = forwardRef<any, CustomInputProps>(
               }}
               sx={{
                 maxHeight: 300,
-                overflowY: 'auto',
+                overflowY: 'hidden',
                 '& .MuiSelect-select': {
                   display: 'flex',
                   alignItems: 'center',
@@ -274,20 +289,74 @@ const CustomInput = forwardRef<any, CustomInputProps>(
         );
 
       case 'file':
+        // Determine currentDisplayedUrl and initial file type flags
+        let currentDisplayedUrl;
+        let isImage = false;
+        let isPdf = false;
+        const isCurrentlyAFileObject = value instanceof File;
+
+        if (isCurrentlyAFileObject) {
+          currentDisplayedUrl = fileModalUrl;
+          isImage = value.type.startsWith('image/');
+          isPdf = value.type === 'application/pdf';
+        } else {
+          // 'value' is an existing URL string (from API)
+          currentDisplayedUrl = value;
+          isImage =
+            currentDisplayedUrl &&
+            (currentDisplayedUrl.endsWith('.png') ||
+              currentDisplayedUrl.endsWith('.jpg') ||
+              currentDisplayedUrl.endsWith('.jpeg') ||
+              currentDisplayedUrl.endsWith('.gif'));
+          isPdf = currentDisplayedUrl && currentDisplayedUrl.endsWith('.pdf');
+        }
+
+        let ButtonLabel = currentDisplayedUrl ? (isPdf ? 'Change PDF' : isImage ? 'Change Image' : 'Change File') : 'Upload File';
+
         return (
           <Box sx={sx} style={style} className={className}>
             <LabelForInput label={label} name={name} required={required} />
-            <input
-              type="file"
-              name={name}
-              onChange={onChange}
-              style={{ ...inputStyle }}
-              ref={setRef}
-              {...inputProps}
-              aria-describedby={errorId}
-            />
+            {/* Display existing file or newly selected file preview */}
+            <Box sx={{ display: 'flex', gap: 3, alignItems: 'flex-start' }}>
+              {currentDisplayedUrl && (
+                <Typography variant="body2">
+                  <span
+                    onClick={() => handleOpenFileModal(currentDisplayedUrl, isPdf)}
+                    style={{ cursor: 'pointer', color: theme.palette.primary.main, textDecoration: 'underline' }}
+                  >
+                    {isPdf ? (
+                      <>
+                        <img src={PdfImage} alt="PDF Icon" style={{ width: 60, height: 60, objectFit: 'cover' }} />
+                      </>
+                    ) : isImage ? (
+                      <>
+                        <img src={currentDisplayedUrl} alt="Existing File" style={{ width: 60, height: 60, objectFit: 'cover' }} />
+                      </>
+                    ) : (
+                      'View Existing File'
+                    )}
+                  </span>
+                </Typography>
+              )}
+              <Button component="label" variant="outlined" size="small" startIcon={<CloudUploadOutlined />} sx={{ mt: 1 }}>
+                {ButtonLabel}
+                <input
+                  type="file"
+                  accept={accpetFileTypes}
+                  name={name}
+                  hidden
+                  onChange={handleFileChange}
+                  ref={setRef}
+                  {...inputProps}
+                  aria-describedby={errorId}
+                />
+              </Button>
+            </Box>
             <ErrorForInput error={error} helperText={helperText} />
             {children}
+
+            {/* --- File Preview Dialog --- */}
+            <FilePreviewDialog open={isFileModalOpen} onClose={handleCloseFileModal} fileUrl={fileModalUrl} isPdf={isCurrentFilePdf} />
           </Box>
         );
 
@@ -319,8 +388,8 @@ const CustomInput = forwardRef<any, CustomInputProps>(
                   borderColor: error
                     ? theme.palette.error.main
                     : theme.palette.mode === 'dark'
-                      ? theme.palette.grey.dark
-                      : theme.palette.grey.lighter,
+                      ? theme.palette.grey[700]
+                      : theme.palette.grey[100],
                   cursor: 'pointer',
                   transition: 'all 0.2s ease-in-out',
                   '&:hover': {
@@ -371,12 +440,12 @@ const CustomInput = forwardRef<any, CustomInputProps>(
                             internalRef.current?.click();
                           }}
                           sx={{
-                            color: 'white',
-                            backgroundColor: 'rgba(255,255,255,0.2)',
-                            '&:hover': { backgroundColor: 'rgba(255,255,255,0.3)' }
+                            color: 'primary.main',
+                            backgroundColor: 'primary.lighter',
+                            '&:hover': { backgroundColor: alpha(theme.palette.primary.light, 0.4) }
                           }}
                         >
-                          <EditIcon />
+                          <EditOutlined />
                         </IconButton>
 
                         <IconButton
@@ -386,12 +455,12 @@ const CustomInput = forwardRef<any, CustomInputProps>(
                             handleRemoveImage();
                           }}
                           sx={{
-                            color: 'white',
-                            backgroundColor: 'rgba(255,255,255,0.2)',
-                            '&:hover': { backgroundColor: 'rgba(255,255,255,0.3)' }
+                            color: 'error.main',
+                            backgroundColor: 'error.lighter',
+                            '&:hover': { backgroundColor: alpha(theme.palette.error.light, 0.4) }
                           }}
                         >
-                          <DeleteIcon />
+                          <DeleteOutline />
                         </IconButton>
                       </Box>
                     </Box>
@@ -485,7 +554,13 @@ const CustomInput = forwardRef<any, CustomInputProps>(
             <Box sx={sx} style={style} className={className}>
               <LabelForInput label={label} name={name} required={required} />
               <DatePicker
-                value={value ? dayjs(value) : null} // Convert the value to a dayjs object or null
+                value={
+                  value
+                    ? typeof value === 'number'
+                      ? dayjs().year(value).startOf('year') // handle year like 2025
+                      : dayjs(value)
+                    : null
+                } // Convert the value to a dayjs object or null
                 onChange={(newValue: dayjs.Dayjs | null) => {
                   if (onChange) {
                     const event = {
@@ -499,7 +574,7 @@ const CustomInput = forwardRef<any, CustomInputProps>(
                 }}
                 aria-describedby={errorId}
                 inputRef={setRef}
-                {...(fullwidth ? { fullWidth: true, error } : {})}
+                sx={{ ...(fullwidth ? { width: '100%' } : {}) }}
               />
               <ErrorForInput error={error} helperText={helperText} />
               {children}
@@ -528,6 +603,56 @@ const CustomInput = forwardRef<any, CustomInputProps>(
             {children}
           </Box>
         );
+
+      case 'editor': {
+        const rteRef = useRef<RichTextEditorRef>(null);
+
+        // Sync external value into TipTap editor
+        useEffect(() => {
+          if (rteRef.current?.editor && value !== rteRef.current.editor.getHTML()) {
+            rteRef.current.editor.commands.setContent(value || '');
+          }
+        }, [value]);
+
+        return (
+          <Box sx={sx} style={style} className={className}>
+            <LabelForInput label={label} name={name} required={required} />
+            <Box sx={{ minHeight: 220, ...inputStyle }}>
+              <RichTextEditor
+                ref={rteRef}
+                extensions={extensions}
+                content={value}
+                sx={{
+                  width: '100%',
+                  minHeight: 220,
+                  overflowY: 'auto',
+                  resize: 'vertical',
+                  border: (theme: Theme) => `1px solid ${theme.palette.grey[300]}`,
+                  '& .MuiTiptap-FieldContainer-notchedOutline': {
+                    border: 'none'
+                  },
+                  '&:focus': {
+                    border: `1px solid ${theme.palette.primary.light}`
+                  },
+                  '&:hover': {
+                    border: `1px solid ${theme.palette.primary.light}`
+                  }
+                }}
+                onUpdate={({ editor }) => {
+                  const html = editor.getHTML();
+                  if (html !== value) {
+                    onChange({ target: { name, value: html } });
+                  }
+                }}
+                renderControls={() => <EditorMenuControls />}
+                {...inputProps}
+              />
+            </Box>
+            <ErrorForInput error={error} helperText={helperText} />
+            {children}
+          </Box>
+        );
+      }
 
       default:
         return (

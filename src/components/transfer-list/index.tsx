@@ -1,5 +1,5 @@
 import MainCard from '@/components/cards/MainCard';
-import { Box, Button, Checkbox, Divider, Grid, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import { Box, Button, Checkbox, Divider, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import { useState } from 'react';
 import { TransferListProps } from './types';
 
@@ -155,11 +155,13 @@ export default function TransferList<T>({
             const label = renderLabel ? renderLabel(item) : itemId;
 
             return (
-              <ListItem key={itemId} button onClick={handleToggle(item)}>
-                <ListItemIcon>
-                  <Checkbox checked={checked.some((c) => c[pk] === itemId)} />
-                </ListItemIcon>
-                <ListItemText primary={label} />
+              <ListItem key={itemId}>
+                <ListItemButton onClick={handleToggle(item)}>
+                  <ListItemIcon>
+                    <Checkbox checked={checked.some((c) => c[pk] === itemId)} />
+                  </ListItemIcon>
+                  <ListItemText primary={label} />
+                </ListItemButton>
               </ListItem>
             );
           })

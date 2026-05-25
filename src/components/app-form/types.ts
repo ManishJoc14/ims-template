@@ -6,7 +6,7 @@ import { ArrayPath, Control, FieldArrayWithId, FieldErrors, FieldValues } from '
    Input Types & Option Types
 ------------------------------------------------------------------ */
 
-export type InputType = 'text' | 'number' | 'select' | 'switch' | 'file' | 'image' | 'password' | 'date' | string;
+export type InputType = 'text' | 'number' | 'select' | 'switch' | 'file' | 'image' | 'password' | 'date' | 'editor' | string;
 
 export interface SelectOption {
   label: string;
@@ -49,6 +49,8 @@ export interface CustomInputProps {
   handleToggleVisibility?: (field: keyof CustomInputProps['showPassword']) => void;
   /** Image preview size (for image type) */
   imageSize?: number;
+  /** Accepts the specified files only for type 'file' */
+  accpetFileTypes?: 'image/*' | 'application/*' | 'image/*,application/*';
   /** To show '*' for required fields */
   required?: boolean;
   /** Label for true value of checkbox */
@@ -92,7 +94,8 @@ export type FormField<T extends FieldValues> = {
   defaultValue?: any; // Default value for the field.
   sx?: any; // Style object for the field.
   imageSize?: number; // Size of the image for image inputs.
-  required?: boolean; // Whether the field is required. default is true.
+  accpetFileTypes?: 'image/*' | 'application/*' | 'image/*,application/*'; // Accepted file types for file inputs. default is 'image/*,application/*'.
+  required?: boolean; // Whether the field is required. default is false.
   trueLabel?: string; // Label for the true value of a checkbox.
   multipleChips?: boolean; // Whether the field allows multiple chip selections.
   falseLabel?: string; // Label for the false value of a checkbox.
@@ -102,6 +105,8 @@ export type FormField<T extends FieldValues> = {
   itemFields?: unknown;
   onDelete?: (index: number, field: TField<T>) => void; // Function to handle deletion of an item in an array field.
   showIf?: (values: T) => boolean; // Function to conditionally show the field based on form values.
+  allowDuplicates?: boolean; // Whether the field allows duplicate values in select options in array field. default is false.
+  maxSelectable?: number; // Maximum number of dynamic filelds that can be added in array filed. default is inifinty.
   inputStyle?: SxProps; // Style object for the input element.
 };
 
@@ -156,4 +161,5 @@ export interface DynamicFieldArraySectionProps<T extends FieldValues> {
   errors: FieldErrors<T>;
   itemFields: FormField<T>[];
   onDelete?: (index: number, field: TField<T>) => void;
+  maxSelectable?: number; // Maximum number of dynamic fields that can be added in array field. default is inifinty.
 }

@@ -1,12 +1,12 @@
 import { Avatar, Box, Button, CircularProgress, Grid, Typography } from '@mui/material';
-import { InfoField } from '@/components/detail-section';
+import DynamicInfoSection, { InfoField } from '@/components/detail-section/sections/dynamic-info';
 
 // project imports
 import MainCard from '@/components/cards/MainCard';
 import { useGetProfile } from '../hooks/useGetProfile';
-import DynamicInfoSection from '@/components/detail-section';
 import { viewProfileConfig } from './profile.config';
 import { DynamicInfoSectionProps } from '@/components/detail-section/types';
+import { UserProfile } from '../redux/types';
 
 export default function ProfileView({ setEdit }: { setEdit: () => void }) {
   const { profileData: profile, isLoading } = useGetProfile();
@@ -14,7 +14,7 @@ export default function ProfileView({ setEdit }: { setEdit: () => void }) {
   if (isLoading) return <CircularProgress />;
   if (!profile) return <Typography variant="h6">Profile not found</Typography>;
 
-  const DynamicInfoSectionProps: DynamicInfoSectionProps = {
+  const DynamicInfoSectionProps: DynamicInfoSectionProps<UserProfile> = {
     ...viewProfileConfig,
     data: profile
   };
