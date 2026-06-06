@@ -1,5 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { axiosInstance, baseURL } from './axios';
+import { axiosInstance } from './axios';
+import { baseURL } from '@/utils/functions/tenant';
 
 const axiosBaseQuery =
   ({ URL } = { URL: '' }) =>
